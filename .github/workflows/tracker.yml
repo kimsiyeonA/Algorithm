@@ -1,0 +1,30 @@
+name: Update Language Tracker
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  update-tracker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Run tracker
+        run: python generate_tracker.py
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add README.md
+          git diff --cached --quiet || git commit -m "auto: update language tracker"
+          git push
