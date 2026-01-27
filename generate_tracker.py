@@ -44,13 +44,18 @@ def detect_info(path_parts):
     구조:
     Algorithm/프로그래머스/0/120583. 중복된 숫자 개수/중복된 숫자 개수.java
     """
-    if len(path_parts) < 5:
+
+    if path_parts[0] == "Algorithm":
+        parts = path_parts[1:]
+    else:
+        parts = path_parts
+        
+    if len(parts) < 4:
         return None, None, None
 
-    # path_parts[0] = Algorithm
-    site = path_parts[1]
-    level = path_parts[2]
-    title_folder = path_parts[3]
+    site = parts[0]
+    level = parts[1]
+    title_folder = parts[2]
 
     title = extract_title(title_folder)
 
