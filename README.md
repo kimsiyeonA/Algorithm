@@ -3,12 +3,7 @@ This is an auto push repository for Baekjoon Online Judge created with [Baekjoon
 
 
 <!-- LANGUAGE_TRACKER_START -->
-| 사이트 | 레벨 | 🟡 C | 🔵 Java | 🟢 Python | 🟣 JS | 🔴 C++ | 🟤 SQL |
-|---|---|---|---|---|---|---|---|
-| generate_tracker.py | - | ⚪ | ⚪ | 🟢 | ⚪ | ⚪ | ⚪ |
-| 백준 | Bronze | ⚪ | 🔵 | ⚪ | ⚪ | ⚪ | ⚪ |
-| 프로그래머스 | 0 | 🟡 | 🔵 | 🟢 | ⚪ | ⚪ | ⚪ |
-| 프로그래머스 | 1 | ⚪ | 🔵 | ⚪ | ⚪ | ⚪ | 🟤 |
-| 프로그래머스 | 2 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 🟤 |
-| 프로그래머스 | 4 | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | 🟤 |
+<table>
+<tr><th style="font-size:12px">사이트</th><th style="font-size:12px">레벨</th><th style="font-size:12px">문제</th><th style="font-size:12px">🟡 C</th><th style="font-size:12px">🔵 Java</th><th style="font-size:12px">🟢 Python</th><th style="font-size:12px">🟣 JS</th><th style="font-size:12px">🔴 C++</th><th style="font-size:12px">🟤 SQL</th></tr>
+</table>
 <!-- LANGUAGE_TRACKER_END -->
