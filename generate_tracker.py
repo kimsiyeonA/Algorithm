@@ -1,105 +1,149 @@
+#!/usr/bin/env python3
 import os
-import re
 from collections import defaultdict
 
-LANG_MAP = {
-    ".c": "C",
-    ".java": "Java",
-    ".py": "Python",
-    ".js": "JS",
-    ".cpp": "C++"
+
+# =========================
+# 설정 영역
+# =========================
+
+
+LANG_ICONS = {
+"c": "🟡",
+"java": "🔵",
+"py": "🟢",
+"js": "🟣",
+"cpp": "🔴",
+"sql": "🟤",
 }
 
-# (site, level, problem) -> {lang: True}
-results = defaultdict(lambda: defaultdict(bool))
 
-def scan_baekjoon(root):
-    # 구조: 백준 / Bronze / 1000. A+B / 1000.c
-    for level in os.listdir(root):
-        level_path = os.path.join(root, level)
-        if not os.path.isdir(level_path):
-            continue
-
-        for problem in os.listdir(level_path):
-            prob_path = os.path.join(level_path, problem)
-            if not os.path.isdir(prob_path):
-                continue
-
-            for f in os.listdir(prob_path):
-                name, ext = os.path.splitext(f)
-                if ext in LANG_MAP:
-                    lang = LANG_MAP[ext]
-                    results[("백준", level, problem)][lang] = True
+EXT_TO_LANG = {
+".c": "c",
+".java": "java",
+".py": "py",
+".js": "js",
+".cpp": "cpp",
+".cc": "cpp",
+".cxx": "cpp",
+".sql": "sql",
+}
 
 
-def scan_programmers(root):
-    # 구조: 프로그래머스 / level 0 / 숫자 비교하기 / solution.java
-    for level in os.listdir(root):
-        level_path = os.path.join(root, level)
-        if not os.path.isdir(level_path):
-            continue
-
-        for problem in os.listdir(level_path):
-            prob_path = os.path.join(level_path, problem)
-            if not os.path.isdir(prob_path):
-                continue
-
-            for f in os.listdir(prob_path):
-                name, ext = os.path.splitext(f)
-                if ext in LANG_MAP:
-                    lang = LANG_MAP[ext]
-                    results[("프로그래머스", level, problem)][lang] = True
+HEADER = "| 사이트 | 레벨 | 🟡 C | 🔵 Java | 🟢 Python | 🟣 JS | 🔴 C++ | 🟤 SQL |\n"
+SEPARATOR = "|---|---|---|---|---|---|---|---|\n"
 
 
-# 스캔 실행
-if os.path.exists("백준"):
-    scan_baekjoon("백준")
-
-if os.path.exists("Baekjoon"):
-    scan_baekjoon("Baekjoon")
-
-if os.path.exists("프로그래머스"):
-    scan_programmers("프로그래머스")
+START_MARK = "<!-- LANGUAGE_TRACKER_START -->"
+END_MARK = "<!-- LANGUAGE_TRACKER_END -->"
 
 
+# =========================
+# 유틸 함수
+# =========================
+
+
+def detect_site_and_level(path_parts):
+
+if not path_parts:
+return None, None
+
+site = path_parts[0]
+level = "-"
+
+# 백준
+if site == "백준" and len(path_parts) >= 2:
+level = path_parts[1]
+
+# 프로그래머스
+elif site == "프로그래머스" and len(path_parts) >= 2:
+level = path_parts[1]
+
+return site, level
+# =========================
+# 메인 로직
+# =========================
+
+
+# (site, level) -> { lang -> True }
+result = defaultdict(lambda: {k: False for k in LANG_ICONS.keys()})
+
+
+for root, dirs, files in os.walk("."):
+for file in files:
+ext = os.path.splitext(file)[1].lower()
+if ext not in EXT_TO_LANG:
+continue
+
+
+lang = EXT_TO_LANG[ext]
+
+
+rel = os.path.relpath(os.path.join(root, file), ".")
+parts = rel.split(os.sep)
+
+
+site, level = detect_site_and_level(parts)
+if not site:
+continue
+
+
+# 같은 사이트 + 레벨이면 자동으로 합쳐짐
+result[(site, level)][lang] = True
+
+
+
+
+# =========================
 # 표 생성
+# =========================
+
+
 lines = []
-lines.append("## 🧠 Algorithm Language Tracker (by Site & Level)\n")
-lines.append("| 사이트 | 레벨 | 문제 | 🟡 C | 🔵 Java | 🟢 Python | 🟣 JS | 🔴 C++ |")
-lines.append("|--------|------|------|------|---------|-----------|-------|--------|")
+lines.append(HEADER)
+lines.append(SEPARATOR)
 
-for (site, level, problem), langs in sorted(results.items()):
-    row = [
-        site,
-        level,
-        problem,
-        "✅" if langs.get("C") else "❌",
-        "✅" if langs.get("Java") else "❌",
-        "✅" if langs.get("Python") else "❌",
-        "✅" if langs.get("JS") else "❌",
-        "✅" if langs.get("C++") else "❌",
-    ]
-    lines.append("| " + " | ".join(row) + " |")
 
-table = "\n".join(lines)
+for (site, level), langs in sorted(result.items()):
+row = [site, level]
 
-# README 자동 영역 덮어쓰기
+
+for key in ["c", "java", "py", "js", "cpp", "sql"]:
+if langs[key]:
+row.append(LANG_ICONS[key])
+else:
+row.append("⚪")
+
+
+lines.append("| " + " | ".join(row) + " |\n")
+
+
+new_table = "".join(lines)
+
+
+# =========================
+# README 갱신
+# =========================
+
+
 with open("README.md", "r", encoding="utf-8") as f:
-    content = f.read()
+readme = f.read()
 
-start = "<!-- LANGUAGE_TRACKER_START -->"
-end = "<!-- LANGUAGE_TRACKER_END -->"
 
-new_block = start + "\n\n" + table + "\n\n" + end
+if START_MARK not in readme or END_MARK not in readme:
+print("Tracker markers not found in README.md")
+exit(1)
 
-content = re.sub(
-    start + ".*?" + end,
-    new_block,
-    content,
-    flags=re.DOTALL
-)
+
+before = readme.split(START_MARK)[0]
+after = readme.split(END_MARK)[1]
+
+
+new_readme = before + START_MARK + "\n" + new_table + END_MARK + after
+
 
 with open("README.md", "w", encoding="utf-8") as f:
-    f.write(content)
+f.write(new_readme)
 
-print("✅ Language tracker updated (grouped by site & level)")
+
+print("Language tracker updated successfully!")
