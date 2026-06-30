@@ -1,0 +1,25 @@
+import java.util.Scanner;
+import java.io.FileInputStream;
+class Solution
+{
+	public static void main(String args[]) throws Exception
+	{
+		Scanner sc = new Scanner(System.in);
+		int T;
+		T=sc.nextInt();
+        int[] array = new int[ T ];
+		for(int i = 0; i < T; i++)
+		{
+              array[i]=sc.nextInt();
+   		}
+		for(int i = 0; i < T; i++)
+		{
+			for(int j = 0; j < T ; j ++){
+             	if(   array[i] > array [j] ){
+                 int temp = array[i];array[i]=array[j];array[j]=temp;   
+                }
+            }
+   		}
+		System.out.println(array[T/2] );
+	}
+}
